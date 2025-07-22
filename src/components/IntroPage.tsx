@@ -19,16 +19,6 @@ interface IntroPageProps {
 const IntroPage: React.FC<IntroPageProps> = ({ onStart }) => {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
-      {/* Header with Logo */}
-      <div className="flex items-start justify-between mb-8">
-        <div className="flex items-center space-x-4">
-          <img 
-            src="/lovable-uploads/aae4a66f-0a08-4c87-9d41-874b9a207de2.png" 
-            alt="ScaleUp Success Logo" 
-            className="h-16 w-auto"
-          />
-        </div>
-      </div>
 
       {/* Hero Section */}
       <div className="text-center space-y-6">

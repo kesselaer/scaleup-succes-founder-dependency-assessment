@@ -146,11 +146,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, onRestart }) => {
     <div className="max-w-6xl mx-auto p-6 space-y-8">
       {/* Header with Logo */}
       <div className="flex items-center justify-between mb-4">
-        <img 
-          src="/lovable-uploads/aae4a66f-0a08-4c87-9d41-874b9a207de2.png" 
-          alt="ScaleUp Success Logo" 
-          className="h-12 w-auto"
-        />
+        <div></div>
         <div className="text-sm text-muted-foreground">
           Assessment Resultaten
         </div>
