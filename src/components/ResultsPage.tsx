@@ -144,12 +144,24 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, onRestart }) => {
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
+      {/* Header with Logo */}
+      <div className="flex items-center justify-between mb-4">
+        <img 
+          src="/lovable-uploads/aae4a66f-0a08-4c87-9d41-874b9a207de2.png" 
+          alt="ScaleUp Success Logo" 
+          className="h-12 w-auto"
+        />
+        <div className="text-sm text-muted-foreground">
+          Assessment Resultaten
+        </div>
+      </div>
+
       {/* Overall Score Card */}
       <Card className="shadow-elevated bg-gradient-subtle border-0">
         <CardHeader className="text-center pb-4">
           <div className="flex justify-center items-center space-x-3 mb-4">
-            <overallAssessment.icon className={`w-8 h-8 text-${overallAssessment.color}`} />
-            <CardTitle className="text-3xl">Uw Founder Dependency Score</CardTitle>
+            <overallAssessment.icon className={`w-8 h-8 text-primary`} />
+            <CardTitle className="text-3xl text-foreground">Uw Founder Dependency Score</CardTitle>
           </div>
           
           <div className="text-6xl font-bold text-primary mb-2">
@@ -158,12 +170,12 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, onRestart }) => {
           
           <Badge 
             variant="secondary" 
-            className={`text-lg px-4 py-2 bg-${overallAssessment.color}/10 text-${overallAssessment.color} border-${overallAssessment.color}/20`}
+            className="text-lg px-4 py-2 bg-accent text-accent-foreground"
           >
             {overallAssessment.level}
           </Badge>
           
-          <CardDescription className="text-lg mt-4 max-w-2xl mx-auto">
+          <CardDescription className="text-lg mt-4 max-w-2xl mx-auto text-foreground">
             {overallAssessment.description}
           </CardDescription>
         </CardHeader>
@@ -194,11 +206,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, onRestart }) => {
               <Progress value={category.percentage} className="h-2" />
               
               {category.average < 3 && (
-                <div className="bg-warning/10 border border-warning/20 rounded-lg p-4">
+                <div className="bg-accent/20 border border-accent/30 rounded-lg p-4">
                   <div className="flex items-start space-x-2">
-                    <Lightbulb className="w-5 h-5 text-warning mt-0.5" />
+                    <Lightbulb className="w-5 h-5 text-foreground mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-warning-foreground mb-1">Verbeteradvies</h4>
+                      <h4 className="font-medium text-foreground mb-1">Verbeteradvies</h4>
                       <p className="text-sm text-muted-foreground leading-relaxed">
                         {getAdvice(category)}
                       </p>
@@ -213,11 +225,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, onRestart }) => {
 
       {/* Action Plan */}
       {lowScoreCategories.length > 0 && (
-        <Card className="shadow-card border-warning/20">
+        <Card className="shadow-card border-accent/30">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <Target className="w-6 h-6 text-warning" />
-              <CardTitle className="text-xl">90-Dagen Actieplan</CardTitle>
+              <Target className="w-6 h-6 text-primary" />
+              <CardTitle className="text-xl text-foreground">90-Dagen Actieplan</CardTitle>
             </div>
             <CardDescription>
               Focus op de laagst scorende categorieën voor maximale impact
@@ -231,11 +243,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, onRestart }) => {
                 .slice(0, 3)
                 .map((category, index) => (
                   <div key={category.id} className="flex space-x-4">
-                    <div className="flex-shrink-0 w-8 h-8 bg-warning/10 rounded-full flex items-center justify-center">
-                      <span className="text-sm font-bold text-warning">{index + 1}</span>
+                    <div className="flex-shrink-0 w-8 h-8 bg-accent/20 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-bold text-foreground">{index + 1}</span>
                     </div>
                     <div>
-                      <h4 className="font-medium">{category.name}</h4>
+                      <h4 className="font-medium text-foreground">{category.name}</h4>
                       <p className="text-sm text-muted-foreground mt-1">
                         {getAdvice(category)}
                       </p>

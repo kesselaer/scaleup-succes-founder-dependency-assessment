@@ -7,50 +7,50 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 0 0% 0%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 0%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 0%;
 
-    /* Professional navy blue for expertise and trust */
-    --primary: 220 100% 20%;
-    --primary-foreground: 0 0% 98%;
-    --primary-light: 220 60% 35%;
-    --primary-dark: 220 100% 15%;
+    /* ScaleUp Success brand colors */
+    --primary: 191 96% 50%;         /* Turquoise blue #05D9F9 */
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 191 80% 65%;    /* Lighter version */
+    --primary-dark: 191 96% 40%;     /* Darker version */
 
-    /* Lighter professional blues */
-    --secondary: 220 30% 96%;
-    --secondary-foreground: 220 100% 20%;
+    /* Yellow accent from brand */
+    --secondary: 51 100% 74%;        /* Yellow #FFE678 */
+    --secondary-foreground: 0 0% 0%;
 
-    --muted: 220 15% 95%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    /* Success green for good scores */
-    --accent: 142 69% 45%;
-    --accent-foreground: 0 0% 98%;
+    /* Success and accent using yellow */
+    --accent: 51 100% 74%;           /* Yellow #FFE678 */
+    --accent-foreground: 0 0% 0%;
 
-    /* Warning colors for assessment results */
+    /* Warning colors */
     --warning: 45 93% 58%;
-    --warning-foreground: 220 100% 20%;
+    --warning-foreground: 0 0% 0%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 20% 90%;
-    --input: 220 20% 90%;
-    --ring: 220 100% 20%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 191 96% 50%;
 
     --radius: 0.75rem;
 
-    /* Professional gradients */
+    /* Brand gradients with turquoise */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
     --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-light)) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(0 0% 98%) 100%);
 
-    /* Professional shadows */
+    /* Professional shadows with turquoise */
     --shadow-card: 0 4px 20px -2px hsl(var(--primary) / 0.1);
     --shadow-elevated: 0 8px 30px -4px hsl(var(--primary) / 0.15);
 

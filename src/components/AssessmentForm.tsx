@@ -162,6 +162,18 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ onComplete }) => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
+      {/* Header with Logo */}
+      <div className="flex items-center justify-between mb-4">
+        <img 
+          src="/lovable-uploads/aae4a66f-0a08-4c87-9d41-874b9a207de2.png" 
+          alt="ScaleUp Success Logo" 
+          className="h-12 w-auto"
+        />
+        <div className="text-sm text-muted-foreground">
+          Founder Dependency Assessment
+        </div>
+      </div>
+
       {/* Progress Bar */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-muted-foreground">

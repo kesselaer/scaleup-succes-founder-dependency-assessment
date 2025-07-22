@@ -19,15 +19,23 @@ interface IntroPageProps {
 const IntroPage: React.FC<IntroPageProps> = ({ onStart }) => {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
+      {/* Header with Logo */}
+      <div className="flex items-start justify-between mb-8">
+        <div className="flex items-center space-x-4">
+          <img 
+            src="/lovable-uploads/aae4a66f-0a08-4c87-9d41-874b9a207de2.png" 
+            alt="ScaleUp Success Logo" 
+            className="h-16 w-auto"
+          />
+        </div>
+      </div>
+
       {/* Hero Section */}
       <div className="text-center space-y-6">
         <div className="space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-            ScaleUp Success
-          </h1>
-          <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground">
             Founder Dependency Assessment
-          </h2>
+          </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Ontdek systematisch waar uw bedrijf te afhankelijk van u is als founder 
             en krijg concrete actiestappen voor meer autonomie.
@@ -35,13 +43,13 @@ const IntroPage: React.FC<IntroPageProps> = ({ onStart }) => {
         </div>
 
         <div className="flex flex-wrap justify-center gap-2 mt-6">
-          <Badge variant="secondary" className="text-sm px-3 py-1">
+          <Badge variant="secondary" className="text-sm px-3 py-1 bg-accent text-accent-foreground">
             24 Vragen
           </Badge>
-          <Badge variant="secondary" className="text-sm px-3 py-1">
+          <Badge variant="secondary" className="text-sm px-3 py-1 bg-accent text-accent-foreground">
             5 Minuten
           </Badge>
-          <Badge variant="secondary" className="text-sm px-3 py-1">
+          <Badge variant="secondary" className="text-sm px-3 py-1 bg-accent text-accent-foreground">
             Directe Resultaten
           </Badge>
         </div>
