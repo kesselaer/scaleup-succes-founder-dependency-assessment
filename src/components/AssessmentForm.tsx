@@ -218,7 +218,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ onComplete }) => {
                   </div>
                   
                   <div className="text-right text-sm space-y-1">
-                    <div className="text-muted-foreground">1 = Volledig afhankelijk</div>
+                    <div className="text-muted-foreground">1 = Founder afhankelijk</div>
                     <div className="text-muted-foreground">4 = Volledig autonoom</div>
                   </div>
                 </div>
