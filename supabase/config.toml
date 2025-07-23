@@ -1,1 +1,4 @@
 project_id = "nflsgpgndroxfyssftnb"
+
+[functions.send-assessment-results]
+verify_jwt = false

@@ -3,11 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Mail } from 'lucide-react';
 
 interface ContactFormProps {
   onSubmit: (contactInfo: ContactInfo) => void;
+  scores: Record<string, number[]>;
 }
 
 export interface ContactInfo {
@@ -17,7 +19,7 @@ export interface ContactInfo {
   email: string;
 }
 
-const ContactForm: React.FC<ContactFormProps> = ({ onSubmit }) => {
+const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
   const [formData, setFormData] = useState<ContactInfo>({
     firstName: '',
     lastName: '',
@@ -61,20 +63,68 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit }) => {
     setIsSubmitting(true);
 
     try {
-      // Voor nu gaan we door zonder email verzenden
-      // TODO: Implementeer email functionaliteit via Supabase
-      toast({
-        title: "Gegevens opgeslagen",
-        description: "Je resultaten worden nu getoond.",
+      // Calculate overall score for email
+      const categories = [
+        { id: 'strategic', weight: 25 },
+        { id: 'operational', weight: 20 },
+        { id: 'customer', weight: 20 },
+        { id: 'financial', weight: 15 },
+        { id: 'leadership', weight: 10 },
+        { id: 'external', weight: 10 }
+      ];
+
+      const categoryResults = categories.map(category => {
+        const categoryScores = scores[category.id] || [];
+        const sum = categoryScores.reduce((acc, score) => acc + score, 0);
+        const percentage = (sum / 16) * 100; // Max 16 points per category
+        const weightedScore = (percentage * category.weight) / 100;
+        return weightedScore;
       });
+
+      const totalScore = categoryResults.reduce((acc, score) => acc + score, 0);
+      
+      const getScoreLevel = (score: number) => {
+        if (score >= 80) return 'Excellent';
+        if (score >= 60) return 'Goed';
+        if (score >= 40) return 'Matig';
+        if (score >= 20) return 'Zwak';
+        return 'Kritiek';
+      };
+
+      // Send email via edge function
+      const { error } = await supabase.functions.invoke('send-assessment-results', {
+        body: {
+          contactInfo: formData,
+          scores,
+          totalScore: Math.round(totalScore),
+          overallLevel: getScoreLevel(totalScore)
+        }
+      });
+
+      if (error) {
+        console.error('Email sending error:', error);
+        toast({
+          title: "Email fout",
+          description: "Het rapport kon niet worden verstuurd, maar je resultaten worden wel getoond.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Rapport verzonden!",
+          description: "Je rapport is verstuurd naar info@scaleupsucces.nl",
+        });
+      }
       
       onSubmit(formData);
     } catch (error) {
+      console.error('Error:', error);
       toast({
         title: "Fout",
-        description: "Er is iets misgegaan. Probeer het opnieuw.",
+        description: "Er is iets misgegaan. Je resultaten worden wel getoond.",
         variant: "destructive",
       });
+      // Still proceed to show results even if email fails
+      onSubmit(formData);
     } finally {
       setIsSubmitting(false);
     }

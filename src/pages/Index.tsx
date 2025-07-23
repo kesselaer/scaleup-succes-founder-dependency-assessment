@@ -42,7 +42,7 @@ const Index = () => {
       )}
       
       {currentState === 'contact' && (
-        <ContactForm onSubmit={handleContactSubmit} />
+        <ContactForm onSubmit={handleContactSubmit} scores={assessmentScores} />
       )}
       
       {currentState === 'results' && (
