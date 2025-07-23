@@ -21,8 +21,16 @@ interface Category {
   questions: string[];
 }
 
+interface ContactInfo {
+  firstName: string;
+  lastName: string;
+  companyName: string;
+  email: string;
+}
+
 interface ResultsPageProps {
   scores: Record<string, number[]>;
+  contactInfo: ContactInfo | null;
   onRestart: () => void;
 }
 
@@ -95,7 +103,7 @@ const categories: Category[] = [
   }
 ];
 
-const ResultsPage: React.FC<ResultsPageProps> = ({ scores, onRestart }) => {
+const ResultsPage: React.FC<ResultsPageProps> = ({ scores, contactInfo, onRestart }) => {
   // Calculate scores per category and total
   const calculateCategoryScore = (categoryId: string, weight: number) => {
     const categoryScores = scores[categoryId] || [];
