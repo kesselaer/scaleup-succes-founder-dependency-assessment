@@ -152,8 +152,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, contactInfo, onRestar
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
+      {/* Print Logo - Only visible when printing */}
+      <div className="hidden print:flex justify-center mb-8">
+        <img 
+          src="/lovable-uploads/c83f8102-5851-44d7-a364-12ecac248789.png" 
+          alt="ScaleUp Succes Logo" 
+          className="h-20 w-auto"
+        />
+      </div>
+
       {/* Header with Logo */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 print:hidden">
         <div></div>
         <div className="text-sm text-muted-foreground">
           Assessment Resultaten
