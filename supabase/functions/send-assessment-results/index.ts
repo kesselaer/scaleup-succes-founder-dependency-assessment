@@ -98,10 +98,39 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { contactInfo, scores, totalScore, overallLevel }: AssessmentResults = await req.json();
 
+    // Helper function to get advice for each category
+    const getAdvice = (categoryId: string) => {
+      const adviceMap: Record<string, string> = {
+        'strategic': 'Investeer in het delegeren van strategische beslissingsbevoegdheden en het documenteren van besluitvormingsprocessen.',
+        'operational': 'Documenteer kritieke processen en train back-up personen voor essentiële functies.',
+        'customer': 'Ontwikkel directe klantrelaties voor teamleden en implementeer een robuust CRM-systeem.',
+        'financial': 'Creëer transparantie in financiële rapportages en delegeer budgetbeslissingen binnen duidelijke kaders.',
+        'leadership': 'Versterk teamleiderschap door KPI-systemen en conflictoplossingsprocessen te implementeren.',
+        'external': 'Diversifieer externe stakeholderrelaties en documenteer procedures voor stakeholder management.'
+      };
+      return adviceMap[categoryId] || 'Focus op het verbeteren van deze categorie.';
+    };
+
+    // Calculate category results for advice
+    const categoryResults = categories.map(category => {
+      const categoryScores = scores[category.id] || [];
+      const sum = categoryScores.reduce((acc, score) => acc + score, 0);
+      const average = sum / 4;
+      return {
+        ...category,
+        raw: sum,
+        average,
+        needsImprovement: average < 3
+      };
+    });
+
+    const lowScoreCategories = categoryResults.filter(cat => cat.needsImprovement);
+
     // Create detailed email content
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="text-align: center; margin-bottom: 30px;">
+          <img src="https://ujlvvjqvvprjwajagknl.supabase.co/storage/v1/object/public/images/scaleup-succes-logo.png" alt="ScaleUp Succes Logo" style="max-height: 80px; margin-bottom: 20px;">
           <h1 style="color: #333;">Founder Dependency Assessment Resultaten</h1>
         </div>
         
@@ -123,6 +152,7 @@ const handler = async (req: Request): Promise<Response> => {
           
           ${categories.map(category => {
             const categoryScores = scores[category.id] || [];
+            const categoryResult = categoryResults.find(c => c.id === category.id);
             return `
               <div style="margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
                 <h3 style="color: #555; margin-top: 0;">${category.name} (${category.weight}%)</h3>
@@ -135,16 +165,62 @@ const handler = async (req: Request): Promise<Response> => {
                     </div>
                   `;
                 }).join('')}
+                
+                ${categoryResult?.needsImprovement ? `
+                  <div style="background: #fff3e0; padding: 12px; border-radius: 6px; border-left: 4px solid #ff9800; margin-top: 10px;">
+                    <h4 style="color: #e65100; margin: 0 0 8px 0; font-size: 14px;">💡 Verbeteradvies</h4>
+                    <p style="margin: 0; color: #666; font-size: 13px; line-height: 1.4;">
+                      ${getAdvice(category.id)}
+                    </p>
+                  </div>
+                ` : ''}
               </div>
             `;
           }).join('')}
         </div>
 
-        <div style="background: #fff3e0; padding: 15px; border-radius: 8px; border-left: 4px solid #ff9800;">
+        ${lowScoreCategories.length > 0 ? `
+          <div style="background: #e8f5e8; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #4caf50;">
+            <h2 style="color: #2e7d32; margin-top: 0;">🎯 90-Dagen Actieplan</h2>
+            <p style="color: #666; margin-bottom: 15px;">Focus op de laagst scorende categorieën voor maximale impact:</p>
+            
+            ${lowScoreCategories
+              .sort((a, b) => a.average - b.average)
+              .slice(0, 3)
+              .map((category, index) => `
+                <div style="margin-bottom: 15px; background: white; padding: 12px; border-radius: 6px;">
+                  <div style="display: flex; align-items: flex-start;">
+                    <div style="background: #4caf50; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; margin-right: 12px; flex-shrink: 0;">
+                      ${index + 1}
+                    </div>
+                    <div>
+                      <h4 style="margin: 0 0 6px 0; color: #333; font-size: 14px;">${category.name}</h4>
+                      <p style="margin: 0; color: #666; font-size: 13px; line-height: 1.4;">
+                        ${getAdvice(category)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+          </div>
+        ` : ''}
+
+        <div style="background: #fff3e0; padding: 15px; border-radius: 8px; border-left: 4px solid #ff9800; margin-bottom: 30px;">
           <p style="margin: 0; color: #666; font-size: 14px;">
             <strong>Score betekenis:</strong><br>
             0 = Founder afhankelijk | 1 = Deels afhankelijk | 2 = Gemiddeld | 3 = Grotendeels onafhankelijk | 4 = Volledig onafhankelijk
           </p>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
+          <h3 style="color: #333; margin-top: 0;">Wil je de vervolgstappen rondom de uitkomsten vrijblijvend bespreken?</h3>
+          <a href="https://scaleupsucces.nl/contact/" style="display: inline-block; background: #1565c0; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px;">
+            Plan een vrijblijvend strategiegesprek in
+          </a>
+        </div>
+
+        <div style="text-align: center; color: #999; font-size: 12px; padding: 20px 0;">
+          <p style="margin: 0;">Deze assessment is bedoeld als indicatie. Voor een grondige analyse van uw bedrijf raden wij professionele begeleiding aan door een ervaren business consultant.</p>
         </div>
       </div>
     `;
