@@ -94,7 +94,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const emailResponse = await resend.emails.send({
       from: "Assessment <onboarding@resend.dev>",
-      to: ["info@scaleupsucces.nl"],
+      to: ["info@scaleupsucces.nl", contactInfo.email],
       subject: `Nieuwe Assessment: ${contactInfo.companyName} - Score: ${totalScore}`,
       html: emailHtml,
     });
