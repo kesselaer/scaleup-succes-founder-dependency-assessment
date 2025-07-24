@@ -108,7 +108,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, contactInfo, onRestar
   const calculateCategoryScore = (categoryId: string, weight: number) => {
     const categoryScores = scores[categoryId] || [];
     const sum = categoryScores.reduce((acc, score) => acc + score, 0);
-    const percentage = (sum / 20) * 100; // Max 20 points per category (4 questions × 5 points, scoring 0-4)
+    const percentage = (sum / 16) * 100; // Max 16 points per category (4 questions × 4 points, scoring 0-4)
     const weightedScore = (percentage * weight) / 100;
     
     return {
@@ -209,7 +209,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, contactInfo, onRestar
                     {Math.round(category.percentage)}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {category.raw}/20 punten
+                    {category.raw}/16 punten
                   </div>
                 </div>
               </div>
