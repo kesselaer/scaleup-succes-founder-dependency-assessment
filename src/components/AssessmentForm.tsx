@@ -116,7 +116,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ onComplete }) => {
   const isCurrentCategoryComplete = () => {
     const categoryScores = getCurrentCategoryScores();
     return currentCategory.questions.every((_, index) => 
-      categoryScores[index] !== undefined && categoryScores[index] >= 1
+      categoryScores[index] !== undefined && categoryScores[index] >= 0
     );
   };
 
@@ -132,7 +132,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ onComplete }) => {
       const formattedScores: Record<string, number[]> = {};
       categories.forEach(category => {
         formattedScores[category.id] = category.questions.map((_, index) => 
-          scores[category.id]?.[index] || 1
+          scores[category.id]?.[index] || 0
         );
       });
       onComplete(formattedScores);
@@ -207,7 +207,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ onComplete }) => {
                 
                 <div className="flex items-center justify-between">
                   <div className="flex space-x-3">
-                    {[1, 2, 3, 4].map(score => (
+                    {[0, 1, 2, 3, 4].map(score => (
                       <ScoreButton 
                         key={score}
                         score={score}
@@ -218,7 +218,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ onComplete }) => {
                   </div>
                   
                   <div className="text-right text-sm space-y-1">
-                    <div className="text-muted-foreground">1 = Founder afhankelijk</div>
+                    <div className="text-muted-foreground">0 = Founder afhankelijk</div>
                     <div className="text-muted-foreground">4 = Volledig autonoom</div>
                   </div>
                 </div>

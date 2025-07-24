@@ -76,7 +76,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
       const categoryResults = categories.map(category => {
         const categoryScores = scores[category.id] || [];
         const sum = categoryScores.reduce((acc, score) => acc + score, 0);
-        const percentage = (sum / 16) * 100; // Max 16 points per category
+        const percentage = (sum / 20) * 100; // Max 20 points per category (5 questions * 4 max score)
         const weightedScore = (percentage * category.weight) / 100;
         return weightedScore;
       });
@@ -84,15 +84,15 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
       const totalScore = categoryResults.reduce((acc, score) => acc + score, 0);
       
       const getScoreLevel = (score: number) => {
-        if (score >= 80) return 'Excellent';
-        if (score >= 60) return 'Goed';
-        if (score >= 40) return 'Matig';
-        if (score >= 20) return 'Zwak';
-        return 'Kritiek';
+        if (score >= 80) return "Excellent";
+        if (score >= 60) return "Goed";
+        if (score >= 40) return "Matig";
+        if (score >= 20) return "Zwak";
+        return "Kritiek";
       };
 
       // Send email via edge function
-      const { error } = await supabase.functions.invoke('send-assessment-results', {
+      const { error } = await supabase.functions.invoke("send-assessment-results", {
         body: {
           contactInfo: formData,
           scores,

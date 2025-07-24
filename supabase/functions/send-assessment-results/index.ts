@@ -20,6 +20,75 @@ interface AssessmentResults {
   overallLevel: string;
 }
 
+const categories = [
+  {
+    id: 'strategic',
+    name: 'Strategische Besluitvorming',
+    weight: 25,
+    questions: [
+      'Worden belangrijke strategische beslissingen alleen door de founder genomen?',
+      'Hebben teamleden duidelijke beslissingsbevoegdheden binnen hun rol?',
+      'Bestaat er een gedocumenteerd besluitvormingsproces?',
+      'Kunnen MT-leden zelfstandig binnen hun domein opereren?'
+    ]
+  },
+  {
+    id: 'operational',
+    name: 'Operationele Processen',
+    weight: 20,
+    questions: [
+      'Zijn kritieke processen gedocumenteerd en overdraagbaar?',
+      'Kunnen belangrijke taken door anderen worden uitgevoerd?',
+      'Bestaan er back-up personen voor essentiële functies?',
+      'Zijn workflows gestandaardiseerd en niet persoon-afhankelijk?'
+    ]
+  },
+  {
+    id: 'customer',
+    name: 'Klantrelaties',
+    weight: 20,
+    questions: [
+      'Hebben klanten directe relaties met andere teamleden?',
+      'Kan het bedrijf nieuwe klanten binnenhalen zonder directe betrokkenheid van de founder?',
+      'Zijn klantprocessen (van lead tot levering) overdraagbaar?',
+      'Bestaat er een CRM-systeem dat klantkennis vastlegt?'
+    ]
+  },
+  {
+    id: 'financial',
+    name: 'Financiële Controle',
+    weight: 15,
+    questions: [
+      'Kunnen anderen financiële rapportages interpreteren en erop handelen?',
+      'Zijn budgetbeslissingen gedelegeerd binnen duidelijke kaders?',
+      'Bestaat er transparantie in financiële prestaties voor het MT?',
+      'Zijn er geautomatiseerde financiële processen en controles?'
+    ]
+  },
+  {
+    id: 'leadership',
+    name: 'Team Leadership',
+    weight: 10,
+    questions: [
+      'Kunnen teamleiders zelfstandig hun teams managen?',
+      'Zijn er duidelijke KPI\'s en feedback-systemen zonder tussenkomst van de founder?',
+      'Kunnen conflicten en problemen zonder de founder worden opgelost?',
+      'Hebben teamleden directe rapportagelijnen naar andere managers?'
+    ]
+  },
+  {
+    id: 'external',
+    name: 'Externe Stakeholders',
+    weight: 10,
+    questions: [
+      'Hebben leveranciers en partners contacten buiten de founder om?',
+      'Kunnen anderen namens het bedrijf onderhandelen?',
+      'Zijn externe relaties gediversifieerd over het team?',
+      'Bestaan er gedocumenteerde procedures voor stakeholder management?'
+    ]
+  }
+];
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -52,41 +121,29 @@ const handler = async (req: Request): Promise<Response> => {
         <div style="margin-bottom: 20px;">
           <h2 style="color: #333;">Gedetailleerde Scores per Categorie</h2>
           
-          <div style="margin-bottom: 15px;">
-            <h3 style="color: #555;">Strategische Besluitvorming (25%)</h3>
-            <p>Scores: ${scores.strategic?.join(', ') || 'N/A'}</p>
-          </div>
-          
-          <div style="margin-bottom: 15px;">
-            <h3 style="color: #555;">Operationele Processen (20%)</h3>
-            <p>Scores: ${scores.operational?.join(', ') || 'N/A'}</p>
-          </div>
-          
-          <div style="margin-bottom: 15px;">
-            <h3 style="color: #555;">Klantrelaties (20%)</h3>
-            <p>Scores: ${scores.customer?.join(', ') || 'N/A'}</p>
-          </div>
-          
-          <div style="margin-bottom: 15px;">
-            <h3 style="color: #555;">Financiële Controle (15%)</h3>
-            <p>Scores: ${scores.financial?.join(', ') || 'N/A'}</p>
-          </div>
-          
-          <div style="margin-bottom: 15px;">
-            <h3 style="color: #555;">Team Leadership (10%)</h3>
-            <p>Scores: ${scores.leadership?.join(', ') || 'N/A'}</p>
-          </div>
-          
-          <div style="margin-bottom: 15px;">
-            <h3 style="color: #555;">Externe Stakeholders (10%)</h3>
-            <p>Scores: ${scores.external?.join(', ') || 'N/A'}</p>
-          </div>
+          ${categories.map(category => {
+            const categoryScores = scores[category.id] || [];
+            return `
+              <div style="margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                <h3 style="color: #555; margin-top: 0;">${category.name} (${category.weight}%)</h3>
+                ${category.questions.map((question, index) => {
+                  const score = categoryScores[index] || 0;
+                  return `
+                    <div style="margin-bottom: 10px; padding: 10px; background: white; border-radius: 4px;">
+                      <p style="margin: 0 0 5px 0; font-weight: 500;">${question}</p>
+                      <p style="margin: 0; color: #666;"><strong>Score: ${score}</strong></p>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            `;
+          }).join('')}
         </div>
 
         <div style="background: #fff3e0; padding: 15px; border-radius: 8px; border-left: 4px solid #ff9800;">
           <p style="margin: 0; color: #666; font-size: 14px;">
             <strong>Score betekenis:</strong><br>
-            1 = Founder afhankelijk | 2 = Deels afhankelijk | 3 = Grotendeels onafhankelijk | 4 = Volledig onafhankelijk
+            0 = Founder afhankelijk | 1 = Deels afhankelijk | 2 = Gemiddeld | 3 = Grotendeels onafhankelijk | 4 = Volledig onafhankelijk
           </p>
         </div>
       </div>
