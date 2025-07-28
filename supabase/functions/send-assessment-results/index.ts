@@ -6,7 +6,17 @@ const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Content-Security-Policy': 'default-src \'self\'; script-src \'none\'; object-src \'none\';'
 };
+
+// Rate limiting store (in production, use Redis or database)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 5; // 5 requests per minute per IP
 
 interface AssessmentResults {
   contactInfo: {
@@ -19,6 +29,37 @@ interface AssessmentResults {
   totalScore: number;
   overallLevel: string;
 }
+
+// Input sanitization and validation
+const sanitizeString = (input: string, maxLength: number = 100): string => {
+  if (typeof input !== 'string') return '';
+  return input
+    .replace(/[<>]/g, '') // Remove HTML tags
+    .trim()
+    .slice(0, maxLength);
+};
+
+const validateEmail = (email: string): boolean => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(email) && email.length <= 254;
+};
+
+const isRateLimited = (clientIP: string): boolean => {
+  const now = Date.now();
+  const record = rateLimitStore.get(clientIP);
+  
+  if (!record || now > record.resetTime) {
+    rateLimitStore.set(clientIP, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return false;
+  }
+  
+  if (record.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return true;
+  }
+  
+  record.count++;
+  return false;
+};
 
 const categories = [
   {
@@ -95,8 +136,45 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Rate limiting
+  const clientIP = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+  if (isRateLimited(clientIP)) {
+    console.warn(`Rate limit exceeded for IP: ${clientIP}`);
+    return new Response(
+      JSON.stringify({ error: 'Te veel verzoeken. Probeer het later opnieuw.' }),
+      { 
+        status: 429, 
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      }
+    );
+  }
+
   try {
-    const { contactInfo, scores, totalScore, overallLevel }: AssessmentResults = await req.json();
+    const requestData = await req.json();
+    
+    // Input validation and sanitization
+    if (!requestData.contactInfo || !requestData.scores) {
+      throw new Error('Ongeldige gegevens ontvangen');
+    }
+
+    const contactInfo = {
+      firstName: sanitizeString(requestData.contactInfo.firstName, 50),
+      lastName: sanitizeString(requestData.contactInfo.lastName, 50),
+      companyName: sanitizeString(requestData.contactInfo.companyName, 100),
+      email: sanitizeString(requestData.contactInfo.email, 254)
+    };
+
+    // Validate required fields
+    if (!contactInfo.firstName || !contactInfo.lastName || !contactInfo.companyName || !contactInfo.email) {
+      throw new Error('Alle velden zijn verplicht');
+    }
+
+    // Validate email format
+    if (!validateEmail(contactInfo.email)) {
+      throw new Error('Ongeldig emailadres');
+    }
+
+    const { scores, totalScore, overallLevel } = requestData;
 
     // Helper function to get advice for each category
     const getAdvice = (categoryId: string) => {
@@ -232,9 +310,9 @@ const handler = async (req: Request): Promise<Response> => {
       html: emailHtml,
     });
 
-    console.log("Assessment email sent successfully:", emailResponse);
+    console.log("Assessment email sent successfully");
 
-    return new Response(JSON.stringify({ success: true, emailResponse }), {
+    return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
@@ -242,11 +320,23 @@ const handler = async (req: Request): Promise<Response> => {
       },
     });
   } catch (error: any) {
-    console.error("Error in send-assessment-results function:", error);
+    console.error("Error in send-assessment-results function");
+    
+    // Enhanced error handling without exposing sensitive information
+    let errorMessage = 'Er is een fout opgetreden bij het verzenden van de email';
+    let statusCode = 500;
+    
+    if (error.message.includes('Alle velden zijn verplicht') || 
+        error.message.includes('Ongeldig emailadres') ||
+        error.message.includes('Ongeldige gegevens ontvangen')) {
+      errorMessage = error.message;
+      statusCode = 400;
+    }
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
-        status: 500,
+        status: statusCode,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );

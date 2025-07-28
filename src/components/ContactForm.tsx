@@ -29,17 +29,26 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
+  // Input sanitization helper
+  const sanitizeInput = (value: string): string => {
+    return value
+      .replace(/[<>]/g, '') // Remove potential HTML tags
+      .trim()
+      .slice(0, 100); // Limit length to prevent buffer overflow
+  };
+
   const handleInputChange = (field: keyof ContactInfo) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const sanitizedValue = sanitizeInput(e.target.value);
     setFormData(prev => ({
       ...prev,
-      [field]: e.target.value
+      [field]: sanitizedValue
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validatie
+    // Enhanced validation
     if (!formData.firstName || !formData.lastName || !formData.companyName || !formData.email) {
       toast({
         title: "Velden ontbreken",
@@ -49,9 +58,37 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
       return;
     }
 
-    // Email validatie
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    // Input length validation
+    if (formData.firstName.length < 2 || formData.firstName.length > 50) {
+      toast({
+        title: "Ongeldige voornaam",
+        description: "Voornaam moet tussen 2 en 50 karakters zijn.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.lastName.length < 2 || formData.lastName.length > 50) {
+      toast({
+        title: "Ongeldige achternaam", 
+        description: "Achternaam moet tussen 2 en 50 karakters zijn.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.companyName.length < 2 || formData.companyName.length > 100) {
+      toast({
+        title: "Ongeldige bedrijfsnaam",
+        description: "Bedrijfsnaam moet tussen 2 en 100 karakters zijn.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Enhanced email validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(formData.email) || formData.email.length > 254) {
       toast({
         title: "Ongeldig emailadres",
         description: "Voer een geldig emailadres in.",
@@ -102,7 +139,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
       });
 
       if (error) {
-        console.error('Email sending error:', error);
+        console.error('Email sending failed');
         toast({
           title: "Email fout",
           description: "Het rapport kon niet worden verstuurd, maar je resultaten worden wel getoond.",
@@ -117,10 +154,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
       
       onSubmit(formData);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Submission failed');
       toast({
-        title: "Fout",
-        description: "Er is iets misgegaan. Je resultaten worden wel getoond.",
+        title: "Technische fout",
+        description: "Er is een technisch probleem opgetreden. Probeer het later opnieuw.",
         variant: "destructive",
       });
       // Still proceed to show results even if email fails
@@ -154,6 +191,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
                   value={formData.firstName}
                   onChange={handleInputChange('firstName')}
                   placeholder="Je voornaam"
+                  maxLength={50}
                   required
                 />
               </div>
@@ -166,6 +204,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
                   value={formData.lastName}
                   onChange={handleInputChange('lastName')}
                   placeholder="Je achternaam"
+                  maxLength={50}
                   required
                 />
               </div>
@@ -179,6 +218,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
                 value={formData.companyName}
                 onChange={handleInputChange('companyName')}
                 placeholder="Naam van je bedrijf"
+                maxLength={100}
                 required
               />
             </div>
@@ -191,6 +231,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
                 value={formData.email}
                 onChange={handleInputChange('email')}
                 placeholder="je@email.com"
+                maxLength={254}
                 required
               />
             </div>
