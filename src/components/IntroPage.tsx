@@ -11,36 +11,59 @@ import {
   ArrowRight,
   BarChart3
 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageToggle from '@/components/LanguageToggle';
 
 interface IntroPageProps {
   onStart: () => void;
 }
 
 const IntroPage: React.FC<IntroPageProps> = ({ onStart }) => {
+  const { t } = useLanguage();
+
+  const areas = [
+    { name: t('category.strategic'), weight: '25%', desc: t('category.strategic.desc') },
+    { name: t('category.operational'), weight: '20%', desc: t('category.operational.desc') },
+    { name: t('category.customer'), weight: '20%', desc: t('category.customer.desc') },
+    { name: t('category.financial'), weight: '15%', desc: t('category.financial.desc') },
+    { name: t('category.leadership'), weight: '10%', desc: t('category.leadership.desc') },
+    { name: t('category.external'), weight: '10%', desc: t('category.external.desc') }
+  ];
+
+  const steps = [
+    { step: 1, title: t('intro.step1.title'), desc: t('intro.step1.desc') },
+    { step: 2, title: t('intro.step2.title'), desc: t('intro.step2.desc') },
+    { step: 3, title: t('intro.step3.title'), desc: t('intro.step3.desc') },
+    { step: 4, title: t('intro.step4.title'), desc: t('intro.step4.desc') }
+  ];
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
+      {/* Language Toggle - Top Right */}
+      <div className="flex justify-end">
+        <LanguageToggle />
+      </div>
 
       {/* Hero Section */}
       <div className="text-center space-y-6">
         <div className="space-y-4">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-            Founder Dependency Assessment
+            {t('intro.title')}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Ontdek systematisch waar uw bedrijf te afhankelijk van u is als founder 
-            en krijg concrete actiestappen voor meer autonomie.
+            {t('intro.subtitle')}
           </p>
         </div>
 
         <div className="flex flex-wrap justify-center gap-2 mt-6">
           <Badge variant="secondary" className="text-sm px-3 py-1 bg-accent text-accent-foreground">
-            24 Vragen
+            {t('intro.badge.questions')}
           </Badge>
           <Badge variant="secondary" className="text-sm px-3 py-1 bg-accent text-accent-foreground">
-            5 Minuten
+            {t('intro.badge.time')}
           </Badge>
           <Badge variant="secondary" className="text-sm px-3 py-1 bg-accent text-accent-foreground">
-            Directe Resultaten
+            {t('intro.badge.results')}
           </Badge>
         </div>
       </div>
@@ -50,12 +73,11 @@ const IntroPage: React.FC<IntroPageProps> = ({ onStart }) => {
         <Card className="shadow-card hover:shadow-elevated transition-smooth">
           <CardHeader className="text-center">
             <Target className="w-8 h-8 text-primary mx-auto mb-2" />
-            <CardTitle className="text-lg">Systematische Analyse</CardTitle>
+            <CardTitle className="text-lg">{t('intro.benefits.analysis.title')}</CardTitle>
           </CardHeader>
           <CardContent className="text-center">
             <CardDescription>
-              Identificeer precies waar uw bedrijf te afhankelijk van u is 
-              met ons wetenschappelijk onderbouwde framework.
+              {t('intro.benefits.analysis.desc')}
             </CardDescription>
           </CardContent>
         </Card>
@@ -63,12 +85,11 @@ const IntroPage: React.FC<IntroPageProps> = ({ onStart }) => {
         <Card className="shadow-card hover:shadow-elevated transition-smooth">
           <CardHeader className="text-center">
             <BarChart3 className="w-8 h-8 text-primary mx-auto mb-2" />
-            <CardTitle className="text-lg">Gewogen Scoring</CardTitle>
+            <CardTitle className="text-lg">{t('intro.benefits.scoring.title')}</CardTitle>
           </CardHeader>
           <CardContent className="text-center">
             <CardDescription>
-              Krijg een objectieve score gebaseerd op de werkelijke impact 
-              van verschillende bedrijfsgebieden op uw autonomie.
+              {t('intro.benefits.scoring.desc')}
             </CardDescription>
           </CardContent>
         </Card>
@@ -76,12 +97,11 @@ const IntroPage: React.FC<IntroPageProps> = ({ onStart }) => {
         <Card className="shadow-card hover:shadow-elevated transition-smooth">
           <CardHeader className="text-center">
             <TrendingUp className="w-8 h-8 text-primary mx-auto mb-2" />
-            <CardTitle className="text-lg">Concrete Acties</CardTitle>
+            <CardTitle className="text-lg">{t('intro.benefits.actions.title')}</CardTitle>
           </CardHeader>
           <CardContent className="text-center">
             <CardDescription>
-              Ontvang direct uitvoerbare verbeteracties en een 90-dagen 
-              actieplan om uw afhankelijkheid te verminderen.
+              {t('intro.benefits.actions.desc')}
             </CardDescription>
           </CardContent>
         </Card>
@@ -92,23 +112,16 @@ const IntroPage: React.FC<IntroPageProps> = ({ onStart }) => {
         <CardHeader>
           <CardTitle className="text-xl flex items-center space-x-2">
             <Users className="w-6 h-6 text-primary" />
-            <span>Wat We Meten</span>
+            <span>{t('intro.areas.title')}</span>
           </CardTitle>
           <CardDescription>
-            De assessment evalueert 6 kritieke gebieden van founder dependency
+            {t('intro.areas.subtitle')}
           </CardDescription>
         </CardHeader>
         
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
-            {[
-              { name: 'Strategische Besluitvorming', weight: '25%', desc: 'Hoe strategische keuzes worden gemaakt' },
-              { name: 'Operationele Processen', weight: '20%', desc: 'Documentatie en overdraagbaarheid van processen' },
-              { name: 'Klantrelaties', weight: '20%', desc: 'Diversificatie van klantcontacten' },
-              { name: 'Financiële Controle', weight: '15%', desc: 'Transparantie en delegatie van financiën' },
-              { name: 'Team Leadership', weight: '10%', desc: 'Zelfstandigheid van teammanagement' },
-              { name: 'Externe Stakeholders', weight: '10%', desc: 'Beheer van leveranciers en partners' }
-            ].map((area, index) => (
+            {areas.map((area, index) => (
               <div key={index} className="flex items-start space-x-3 p-3 rounded-lg bg-muted/50">
                 <div className="flex-shrink-0 w-2 h-2 bg-primary rounded-full mt-2"></div>
                 <div className="flex-grow">
@@ -129,18 +142,13 @@ const IntroPage: React.FC<IntroPageProps> = ({ onStart }) => {
         <CardHeader>
           <CardTitle className="text-xl flex items-center space-x-2">
             <Clock className="w-6 h-6 text-primary" />
-            <span>Hoe Het Werkt</span>
+            <span>{t('intro.howItWorks.title')}</span>
           </CardTitle>
         </CardHeader>
         
         <CardContent>
           <div className="space-y-4">
-            {[
-              { step: 1, title: 'Beantwoord 24 vragen', desc: '4 vragen per categorie, score 1-4 per vraag' },
-              { step: 2, title: 'Automatische berekening', desc: 'Gewogen score op basis van businessimpact' },
-              { step: 3, title: 'Ontvang uw resultaten', desc: 'Totaalscore + gedetailleerde analyse per gebied' },
-              { step: 4, title: 'Krijg verbeteracties', desc: '90-dagen actieplan voor meer autonomie' }
-            ].map((item) => (
+            {steps.map((item) => (
               <div key={item.step} className="flex items-start space-x-4">
                 <div className="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                   <span className="text-sm font-bold text-primary-foreground">{item.step}</span>
@@ -161,10 +169,9 @@ const IntroPage: React.FC<IntroPageProps> = ({ onStart }) => {
           <CardContent className="p-8">
             <div className="space-y-4">
               <CheckCircle className="w-12 h-12 text-accent mx-auto" />
-              <h3 className="text-2xl font-semibold">Klaar om te beginnen?</h3>
+              <h3 className="text-2xl font-semibold">{t('intro.cta.title')}</h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                Start nu uw assessment en ontdek binnen 5 minuten waar uw bedrijf 
-                het meest afhankelijk van u is als founder.
+                {t('intro.cta.desc')}
               </p>
               
               <Button 
@@ -172,7 +179,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onStart }) => {
                 size="lg"
                 className="text-lg px-8 py-3 shadow-md hover:shadow-lg transition-smooth"
               >
-                Assessment Starten
+                {t('intro.cta.button')}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
@@ -180,7 +187,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onStart }) => {
         </Card>
 
         <p className="text-sm text-muted-foreground">
-          Geen registratie vereist • Resultaten worden niet opgeslagen • Volledig privé
+          {t('intro.privacy')}
         </p>
       </div>
     </div>

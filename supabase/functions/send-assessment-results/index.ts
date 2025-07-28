@@ -28,6 +28,7 @@ interface AssessmentResults {
   scores: Record<string, number[]>;
   totalScore: number;
   overallLevel: string;
+  language?: 'nl' | 'en';
 }
 
 // Input sanitization and validation

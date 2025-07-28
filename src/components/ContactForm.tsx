@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Mail } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ContactFormProps {
   onSubmit: (contactInfo: ContactInfo) => void;
@@ -20,6 +21,7 @@ export interface ContactInfo {
 }
 
 const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
+  const { t, language } = useLanguage();
   const [formData, setFormData] = useState<ContactInfo>({
     firstName: '',
     lastName: '',
@@ -51,8 +53,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
     // Enhanced validation
     if (!formData.firstName || !formData.lastName || !formData.companyName || !formData.email) {
       toast({
-        title: "Velden ontbreken",
-        description: "Vul alle velden in om door te gaan.",
+        title: t('validation.fieldsTitle'),
+        description: t('validation.required'),
         variant: "destructive",
       });
       return;
@@ -61,8 +63,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
     // Input length validation
     if (formData.firstName.length < 2 || formData.firstName.length > 50) {
       toast({
-        title: "Ongeldige voornaam",
-        description: "Voornaam moet tussen 2 en 50 karakters zijn.",
+        title: t('validation.firstNameTitle'),
+        description: t('validation.firstName'),
         variant: "destructive",
       });
       return;
@@ -70,8 +72,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
 
     if (formData.lastName.length < 2 || formData.lastName.length > 50) {
       toast({
-        title: "Ongeldige achternaam", 
-        description: "Achternaam moet tussen 2 en 50 karakters zijn.",
+        title: t('validation.lastNameTitle'), 
+        description: t('validation.lastName'),
         variant: "destructive",
       });
       return;
@@ -79,8 +81,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
 
     if (formData.companyName.length < 2 || formData.companyName.length > 100) {
       toast({
-        title: "Ongeldige bedrijfsnaam",
-        description: "Bedrijfsnaam moet tussen 2 en 100 karakters zijn.",
+        title: t('validation.companyNameTitle'),
+        description: t('validation.companyName'),
         variant: "destructive",
       });
       return;
@@ -90,8 +92,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(formData.email) || formData.email.length > 254) {
       toast({
-        title: "Ongeldig emailadres",
-        description: "Voer een geldig emailadres in.",
+        title: t('validation.emailTitle'),
+        description: t('validation.email'),
         variant: "destructive",
       });
       return;
@@ -121,11 +123,11 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
       const totalScore = categoryResults.reduce((acc, score) => acc + score, 0);
       
       const getScoreLevel = (score: number) => {
-        if (score >= 80) return "Excellent";
-        if (score >= 60) return "Goed";
-        if (score >= 40) return "Matig";
-        if (score >= 20) return "Zwak";
-        return "Kritiek";
+        if (score >= 80) return t('results.level.excellent');
+        if (score >= 60) return t('results.level.good');
+        if (score >= 40) return t('results.level.moderate');
+        if (score >= 20) return t('results.level.weak');
+        return t('results.level.critical');
       };
 
       // Send email via edge function
@@ -134,21 +136,22 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
           contactInfo: formData,
           scores,
           totalScore: Math.round(totalScore),
-          overallLevel: getScoreLevel(totalScore)
+          overallLevel: getScoreLevel(totalScore),
+          language
         }
       });
 
       if (error) {
         console.error('Email sending failed');
         toast({
-          title: "Email fout",
-          description: "Het rapport kon niet worden verstuurd, maar je resultaten worden wel getoond.",
+          title: t('toast.emailErrorTitle'),
+          description: t('toast.emailError'),
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Rapport verzonden!",
-          description: "Je rapport is verstuurd naar info@scaleupsucces.nl",
+          title: t('toast.emailSuccessTitle'),
+          description: t('toast.emailSuccess'),
         });
       }
       
@@ -156,8 +159,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
     } catch (error) {
       console.error('Submission failed');
       toast({
-        title: "Technische fout",
-        description: "Er is een technisch probleem opgetreden. Probeer het later opnieuw.",
+        title: t('toast.technicalErrorTitle'),
+        description: t('toast.technicalError'),
         variant: "destructive",
       });
       // Still proceed to show results even if email fails
@@ -173,10 +176,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
         <CardHeader className="text-center">
           <div className="flex justify-center items-center space-x-3 mb-4">
             <Mail className="w-8 h-8 text-primary" />
-            <CardTitle className="text-2xl text-foreground">Bijna klaar!</CardTitle>
+            <CardTitle className="text-2xl text-foreground">{t('contact.title')}</CardTitle>
           </div>
           <CardDescription className="text-lg">
-            Laat je gegevens achter om je persoonlijke Founder Dependency rapport te ontvangen
+            {t('contact.subtitle')}
           </CardDescription>
         </CardHeader>
         
@@ -184,26 +187,26 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">Voornaam *</Label>
+                <Label htmlFor="firstName">{t('contact.firstName')} *</Label>
                 <Input
                   id="firstName"
                   type="text"
                   value={formData.firstName}
                   onChange={handleInputChange('firstName')}
-                  placeholder="Je voornaam"
+                  placeholder={t('contact.firstName.placeholder')}
                   maxLength={50}
                   required
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="lastName">Achternaam *</Label>
+                <Label htmlFor="lastName">{t('contact.lastName')} *</Label>
                 <Input
                   id="lastName"
                   type="text"
                   value={formData.lastName}
                   onChange={handleInputChange('lastName')}
-                  placeholder="Je achternaam"
+                  placeholder={t('contact.lastName.placeholder')}
                   maxLength={50}
                   required
                 />
@@ -211,26 +214,26 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="companyName">Bedrijfsnaam *</Label>
+              <Label htmlFor="companyName">{t('contact.companyName')} *</Label>
               <Input
                 id="companyName"
                 type="text"
                 value={formData.companyName}
                 onChange={handleInputChange('companyName')}
-                placeholder="Naam van je bedrijf"
+                placeholder={t('contact.companyName.placeholder')}
                 maxLength={100}
                 required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="email">Emailadres *</Label>
+              <Label htmlFor="email">{t('contact.email')} *</Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={handleInputChange('email')}
-                placeholder="je@email.com"
+                placeholder={t('contact.email.placeholder')}
                 maxLength={254}
                 required
               />
@@ -238,7 +241,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
             
             <div className="bg-muted/50 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground">
-                Je rapport wordt verstuurd naar <strong>info@scaleupsucces.nl</strong> en je ontvangt een kopie op het opgegeven emailadres.
+                {t('contact.note').replace('**', '').replace('**', '')}
               </p>
             </div>
             
@@ -247,7 +250,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, scores }) => {
               className="w-full"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Bezig met verzenden...' : 'Verstuur mijn rapport'}
+              {isSubmitting ? t('contact.submitting') : t('contact.submit')}
             </Button>
           </form>
         </CardContent>

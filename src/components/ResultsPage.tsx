@@ -13,6 +13,7 @@ import {
   Target,
   Lightbulb
 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Category {
   id: string;
@@ -34,76 +35,78 @@ interface ResultsPageProps {
   onRestart: () => void;
 }
 
-const categories: Category[] = [
-  {
-    id: 'strategic',
-    name: 'Strategische Besluitvorming',
-    weight: 25,
-    questions: [
-      'Strategische beslissingen door founder alleen',
-      'Beslissingsbevoegdheden teamleden',
-      'Gedocumenteerd besluitvormingsproces',
-      'Zelfstandig opereren MT-leden'
-    ]
-  },
-  {
-    id: 'operational',
-    name: 'Operationele Processen',
-    weight: 20,
-    questions: [
-      'Gedocumenteerde processen',
-      'Taken door anderen uitvoerbaar',
-      'Back-up personen aanwezig',
-      'Gestandaardiseerde workflows'
-    ]
-  },
-  {
-    id: 'customer',
-    name: 'Klantrelaties',
-    weight: 20,
-    questions: [
-      'Klantrelaties met teamleden',
-      'Klantenwerving zonder founder',
-      'Overdraagbare klantprocessen',
-      'CRM-systeem voor klantkennis'
-    ]
-  },
-  {
-    id: 'financial',
-    name: 'Financiële Controle',
-    weight: 15,
-    questions: [
-      'Financiële rapportages door anderen',
-      'Gedelegeerde budgetbeslissingen',
-      'Transparantie financiële prestaties',
-      'Geautomatiseerde processen'
-    ]
-  },
-  {
-    id: 'leadership',
-    name: 'Team Leadership',
-    weight: 10,
-    questions: [
-      'Zelfstandig teammanagement',
-      'KPIs zonder founder tussenkomst',
-      'Conflictoplossing zonder founder',
-      'Directe rapportagelijnen'
-    ]
-  },
-  {
-    id: 'external',
-    name: 'Externe Stakeholders',
-    weight: 10,
-    questions: [
-      'Contacten buiten founder om',
-      'Onderhandelingen door anderen',
-      'Gediversifieerde externe relaties',
-      'Gedocumenteerde procedures'
-    ]
-  }
-];
-
 const ResultsPage: React.FC<ResultsPageProps> = ({ scores, contactInfo, onRestart }) => {
+  const { t } = useLanguage();
+
+  const categories: Category[] = [
+    {
+      id: 'strategic',
+      name: t('category.strategic'),
+      weight: 25,
+      questions: [
+        'Strategische beslissingen door founder alleen',
+        'Beslissingsbevoegdheden teamleden', 
+        'Gedocumenteerd besluitvormingsproces',
+        'Zelfstandig opereren MT-leden'
+      ]
+    },
+    {
+      id: 'operational',
+      name: t('category.operational'),
+      weight: 20,
+      questions: [
+        'Gedocumenteerde processen',
+        'Taken door anderen uitvoerbaar',
+        'Back-up personen aanwezig',
+        'Gestandaardiseerde workflows'
+      ]
+    },
+    {
+      id: 'customer',
+      name: t('category.customer'),
+      weight: 20,
+      questions: [
+        'Klantrelaties met teamleden',
+        'Klantenwerving zonder founder',
+        'Overdraagbare klantprocessen',
+        'CRM-systeem voor klantkennis'
+      ]
+    },
+    {
+      id: 'financial',
+      name: t('category.financial'),
+      weight: 15,
+      questions: [
+        'Financiële rapportages door anderen',
+        'Gedelegeerde budgetbeslissingen',
+        'Transparantie financiële prestaties',
+        'Geautomatiseerde processen'
+      ]
+    },
+    {
+      id: 'leadership',
+      name: t('category.leadership'),
+      weight: 10,
+      questions: [
+        'Zelfstandig teammanagement',
+        'KPIs zonder founder tussenkomst',
+        'Conflictoplossing zonder founder',
+        'Directe rapportagelijnen'
+      ]
+    },
+    {
+      id: 'external',
+      name: t('category.external'),
+      weight: 10,
+      questions: [
+        'Contacten buiten founder om',
+        'Onderhandelingen door anderen',
+        'Gediversifieerde externe relaties',
+        'Gedocumenteerde procedures'
+      ]
+    }
+  ];
+
   // Calculate scores per category and total
   const calculateCategoryScore = (categoryId: string, weight: number) => {
     const categoryScores = scores[categoryId] || [];
@@ -127,27 +130,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, contactInfo, onRestar
   const totalScore = categoryResults.reduce((acc, cat) => acc + cat.weightedScore, 0);
 
   const getScoreLevel = (score: number) => {
-    if (score >= 80) return { level: 'Excellent', color: 'accent', icon: CheckCircle, description: 'Bedrijf is grotendeels autonoom' };
-    if (score >= 60) return { level: 'Goed', color: 'primary', icon: TrendingUp, description: 'Enkele verbeterpunten' };
-    if (score >= 40) return { level: 'Matig', color: 'warning', icon: AlertTriangle, description: 'Actie vereist' };
-    if (score >= 20) return { level: 'Zwak', color: 'destructive', icon: TrendingDown, description: 'Hoge afhankelijkheid' };
-    return { level: 'Kritiek', color: 'destructive', icon: AlertTriangle, description: 'Bedrijf kan niet functioneren zonder founder' };
+    if (score >= 80) return { level: t('results.level.excellent'), color: 'accent', icon: CheckCircle, description: t('results.level.excellent.desc') };
+    if (score >= 60) return { level: t('results.level.good'), color: 'primary', icon: TrendingUp, description: t('results.level.good.desc') };
+    if (score >= 40) return { level: t('results.level.moderate'), color: 'warning', icon: AlertTriangle, description: t('results.level.moderate.desc') };
+    if (score >= 20) return { level: t('results.level.weak'), color: 'destructive', icon: TrendingDown, description: t('results.level.weak.desc') };
+    return { level: t('results.level.critical'), color: 'destructive', icon: AlertTriangle, description: t('results.level.critical.desc') };
   };
 
   const overallAssessment = getScoreLevel(totalScore);
   const lowScoreCategories = categoryResults.filter(cat => cat.average < 3);
 
   const getAdvice = (category: any) => {
-    const adviceMap: Record<string, string> = {
-      'strategic': 'Investeer in het delegeren van strategische beslissingsbevoegdheden en het documenteren van besluitvormingsprocessen.',
-      'operational': 'Documenteer kritieke processen en train back-up personen voor essentiële functies.',
-      'customer': 'Ontwikkel directe klantrelaties voor teamleden en implementeer een robuust CRM-systeem.',
-      'financial': 'Creëer transparantie in financiële rapportages en delegeer budgetbeslissingen binnen duidelijke kaders.',
-      'leadership': 'Versterk teamleiderschap door KPI-systemen en conflictoplossingsprocessen te implementeren.',
-      'external': 'Diversifieer externe stakeholderrelaties en documenteer procedures voor stakeholder management.'
-    };
-    
-    return adviceMap[category.id] || 'Focus op het verbeteren van deze categorie.';
+    return t(`advice.${category.id}`);
   };
 
   return (
@@ -165,7 +159,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, contactInfo, onRestar
       <div className="flex items-center justify-between mb-4 print:hidden">
         <div></div>
         <div className="text-sm text-muted-foreground">
-          Assessment Resultaten
+          {t('results.title')}
         </div>
       </div>
 
@@ -174,7 +168,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, contactInfo, onRestar
         <CardHeader className="text-center pb-4">
           <div className="flex justify-center items-center space-x-3 mb-4">
             <overallAssessment.icon className={`w-8 h-8 text-primary`} />
-            <CardTitle className="text-3xl text-foreground">Uw Founder Dependency Score</CardTitle>
+            <CardTitle className="text-3xl text-foreground">{t('results.scoreTitle')}</CardTitle>
           </div>
           
           <div className="text-6xl font-bold text-primary mb-2">
@@ -202,7 +196,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, contactInfo, onRestar
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="text-lg">{category.name}</CardTitle>
-                  <CardDescription>Weging: {category.weight}%</CardDescription>
+                  <CardDescription>{t('assessment.weighting')}: {category.weight}%</CardDescription>
                 </div>
                 <div className="text-right">
                   <div className="text-2xl font-bold text-primary">
@@ -219,17 +213,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, contactInfo, onRestar
               <Progress value={category.percentage} className="h-2" />
               
               {category.average < 3 && (
-                <div className="bg-accent/20 border border-accent/30 rounded-lg p-4">
-                  <div className="flex items-start space-x-2">
-                    <Lightbulb className="w-5 h-5 text-foreground mt-0.5" />
-                    <div>
-                      <h4 className="font-medium text-foreground mb-1">Verbeteradvies</h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {getAdvice(category)}
-                      </p>
+                  <div className="bg-accent/20 border border-accent/30 rounded-lg p-4">
+                    <div className="flex items-start space-x-2">
+                      <Lightbulb className="w-5 h-5 text-foreground mt-0.5" />
+                      <div>
+                        <h4 className="font-medium text-foreground mb-1">{t('results.advice.title')}</h4>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {getAdvice(category)}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
               )}
             </CardContent>
           </Card>
@@ -242,10 +236,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, contactInfo, onRestar
           <CardHeader>
             <div className="flex items-center space-x-2">
               <Target className="w-6 h-6 text-primary" />
-              <CardTitle className="text-xl text-foreground">90-Dagen Actieplan</CardTitle>
+              <CardTitle className="text-xl text-foreground">{t('results.actionPlan.title')}</CardTitle>
             </div>
             <CardDescription>
-              Focus op de laagst scorende categorieën voor maximale impact
+              {t('results.actionPlan.subtitle')}
             </CardDescription>
           </CardHeader>
           
@@ -280,7 +274,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, contactInfo, onRestar
           className="flex items-center space-x-2"
         >
           <RotateCcw className="w-4 h-4" />
-          <span>Nieuwe Assessment</span>
+          <span>{t('results.newAssessment')}</span>
         </Button>
         
         <Button
@@ -288,7 +282,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, contactInfo, onRestar
           className="flex items-center space-x-2"
         >
           <Download className="w-4 h-4" />
-          <span>Resultaten Printen</span>
+          <span>{t('results.print')}</span>
         </Button>
       </div>
 
@@ -296,8 +290,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ scores, contactInfo, onRestar
       <Card className="bg-muted/50">
         <CardContent className="p-4 text-center">
           <p className="text-sm text-muted-foreground">
-            Deze assessment is bedoeld als indicatie. Voor een grondige analyse van uw bedrijf 
-            raden wij professionele begeleiding aan door een ervaren business consultant.
+            {t('results.disclaimer')}
           </p>
         </CardContent>
       </Card>
